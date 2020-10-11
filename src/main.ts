@@ -8,7 +8,7 @@ async function bootstrap() {
   const microservice = app.connectMicroservice({
     transport: Transport.MQTT,
     options: {
-      url: 'mqtt://69.164.210.24:1883',
+      url: process.env.MQTT_URL,
     }
   });
 

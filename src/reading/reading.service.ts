@@ -21,16 +21,9 @@ export class ReadingService {
     return temp;
   }
 
-  async addTemp(data: String): Promise<any> {
-    var createTempDTO: CreateTempDTO
-    console.log('t')
-    console.log(data)
-
-
-    const newTemp = await new this.tempModel();
-    newTemp.temper = data
+  async addTemp(data: CreateTempDTO) {
+    const newTemp = await new this.tempModel(data);
     newTemp.save();
-    return 'Done'
   }
 
   async editTemp(tempID, createTempDTO: CreateTempDTO): Promise<Temp> {

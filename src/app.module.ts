@@ -6,7 +6,6 @@ import { ReadingService } from './reading/reading.service';
 import { ReadingModule } from './reading/reading.module';
 import { ConfigModule } from '@nestjs/config';
 
-//console.log(database_url);
 
 @Module({
   imports: [ConfigModule.forRoot(), MongooseModule.forRoot(process.env.DATABASE_URL), ReadingModule],

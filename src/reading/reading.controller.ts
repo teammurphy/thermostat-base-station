@@ -10,7 +10,7 @@ export class ReadingController {
 
 
   @EventPattern('new_reading')
-  async newReading(data: String) {
+  async newReading(data: CreateTempDTO) {
     this.readingService.addTemp(data);
   }
 }
