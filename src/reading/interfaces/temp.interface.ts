@@ -1,8 +1,8 @@
 import { Document } from 'mongoose';
 
 export interface Temp extends Document {
-  thermo_id: number,
-  thermo_name: String,
-  time: Date,
-  temp: number
+  readonly thermo_id: number,
+  readonly thermo_name: String,
+  readonly time: Date,
+  readonly temp: number
 }

@@ -5,11 +5,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ReadingService } from './reading/reading.service';
 import { ReadingModule } from './reading/reading.module';
 import { ConfigModule } from '@nestjs/config';
+import { TemperaturesController } from './temperatures/temperatures.controller';
 
 
 @Module({
   imports: [ConfigModule.forRoot(), MongooseModule.forRoot(process.env.DATABASE_URL), ReadingModule],
-  controllers: [AppController],
+  controllers: [AppController, TemperaturesController],
   providers: [AppService],
 })
 export class AppModule { }
