@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ReadingController } from './reading.controller';
 import { ReadingService } from './reading.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ReadingSchema } from './schemas/reading.schema';
+import { ReadingSchema } from '../sharedSchemes/schemas/reading.schema';
 
 @Module({
   imports: [

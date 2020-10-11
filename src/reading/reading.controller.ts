@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { ReadingService } from './reading.service';
-import { CreateTempDTO } from './dto/create-temp.dto';
+import { CreateTempDTO } from '../sharedSchemes/dto/create-temp.dto';
 import { EventPattern, MqttContext, Ctx, MessagePattern } from '@nestjs/microservices'
 
 @Controller('reading')

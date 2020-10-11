@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Temp } from './interfaces/temp.interface';
-import { CreateTempDTO } from './dto/create-temp.dto';
+import { Temp } from '../sharedSchemes/interfaces/temp.interface';
+import { CreateTempDTO } from '../sharedSchemes/dto/create-temp.dto';
 
 @Injectable()
 export class ReadingService {
