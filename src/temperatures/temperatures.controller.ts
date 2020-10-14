@@ -5,7 +5,7 @@ export class TemperaturesController {
   @Get()
   async getReadings() {
     console.log("got request")
-    return "hello world"
+    return { "hi": 'hello world' }
   }
 
 
