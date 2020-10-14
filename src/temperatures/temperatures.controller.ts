@@ -4,6 +4,7 @@ import { Controller, Get } from '@nestjs/common';
 export class TemperaturesController {
   @Get()
   async getReadings() {
+    console.log("got request")
     return "hello world"
   }
 
