@@ -32,8 +32,7 @@ export class TemperaturesService {
     const tempReadingModelObj = this.tempReadingModel;
 
     const temps = await Promise.all(sensors.map(async function(e: number): Promise<number> {
-      // TODO: sort by most recent
-      const reading = await tempReadingModelObj.findOne({ thermo_id: e });
+      const reading = await tempReadingModelObj.findOne({ thermo_id: e }).sort({ date: -1 });
       return reading.temp;
     }));
 
