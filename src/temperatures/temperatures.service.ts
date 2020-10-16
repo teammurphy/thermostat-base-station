@@ -3,14 +3,15 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { TempReading } from '../sharedSchemes/interfaces/temp.interface';
 import { CreateTempDTO } from '../sharedSchemes/dto/create-temp.dto';
+import { Settings } from "../sharedSchemes/interfaces/settings.interface";
+import { CreateSettingsDTO } from "../sharedSchemes/dto/create-settings.dto";
 
 @Injectable()
 export class TemperaturesService {
-  constructor(@InjectModel('TempReading') private readonly tempReadingModel: Model<TempReading>) { }
+  constructor(@InjectModel('TempReading') private readonly tempReadingModel: Model<TempReading>, @InjectModel('Settings') private readonly settingsModel: Model<Settings>) { }
 
   async getTemps(): Promise<TempReading[]> {
-    const temps = await this.tempReadingModel.find().exec();
-    return temps;
+    return await this.tempReadingModel.find().select(['-_id', '-__v']).exec();
   }
 
   async getTemp(tempID): Promise<TempReading> {
@@ -18,6 +19,10 @@ export class TemperaturesService {
       .findById(tempID)
       .exec();
     return temp;
+  }
+
+  async getAllSettings(): Promise<Settings[]> {
+    return await this.settingsModel.find().select(['-_id', '-__v']).exec();
   }
 
 
