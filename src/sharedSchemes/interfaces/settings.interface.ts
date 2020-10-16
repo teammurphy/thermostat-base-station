@@ -5,4 +5,5 @@ export interface Settings extends Document {
   readonly set_upper: number,
   readonly set_lower: number,
   readonly set_temp: number
+  readonly thermo_ids: [number]
 }

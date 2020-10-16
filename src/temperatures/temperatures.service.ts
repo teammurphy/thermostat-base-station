@@ -21,6 +21,27 @@ export class TemperaturesService {
     return temp;
   }
 
+  async getSetTempbyZoneNum(zone_num): Promise<number> {
+    const zone_settings = await this.settingsModel.findOne({ zone: zone_num });
+    return zone_settings.set_temp;
+  }
+
+  async getCurrentTempByZoneNum(zone_num): Promise<number> {
+    const zone_settings = await this.settingsModel.findOne({ zone: zone_num });
+    const sensors = zone_settings.thermo_ids;
+    const tempReadingModelObj = this.tempReadingModel;
+
+    const temps = await Promise.all(sensors.map(async function(e: number): Promise<number> {
+      // TODO: sort by most recent
+      const reading = await tempReadingModelObj.findOne({ thermo_id: e });
+      return reading.temp;
+    }));
+
+    return Math.round(temps.reduce((a, b) => a + b, 0) / temps.length);
+
+
+  }
+
   async getAllSettings(): Promise<Settings[]> {
     return await this.settingsModel.find().select(['-_id', '-__v']).exec();
   }

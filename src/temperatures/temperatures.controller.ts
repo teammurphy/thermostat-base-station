@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { TemperaturesService } from './temperatures.service';
 
 @Controller('temperatures')
@@ -19,6 +19,16 @@ export class TemperaturesController {
   @Get('/all/settings')
   async getAllSettings() {
     return this.temperaturesService.getAllSettings()
+  }
+
+  @Get('/setTemp/:zone_num')
+  async readSetTempbyZoneNum(@Param('zone_num') zone_num: number): Promise<number> {
+    return this.temperaturesService.getSetTempbyZoneNum(zone_num);
+  }
+
+  @Get('/getTemp/:zone_num')
+  async readTempbyZoneNum(@Param('zone_num') zone_num: number): Promise<number> {
+    return this.temperaturesService.getCurrentTempByZoneNum(zone_num);
   }
 
 
