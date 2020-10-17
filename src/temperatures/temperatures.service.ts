@@ -6,6 +6,8 @@ import { CreateTempDTO } from '../sharedSchemes/dto/create-temp.dto';
 import { Settings } from "../sharedSchemes/interfaces/settings.interface";
 import { CreateSettingsDTO } from "../sharedSchemes/dto/create-settings.dto";
 import { zoneinfoDTO } from '../sharedSchemes/dto/zoneinfo.dto';
+import  *  as _ from 'lodash';
+import { runInThisContext } from 'vm';
 
 @Injectable()
 export class TemperaturesService {
@@ -35,16 +37,18 @@ export class TemperaturesService {
     })
   }
 
-  async getZoneInfo(zone_num): Promise<Settings>{
-    return await this.settingsModel.findOne({zone: zone_num})
+  async getZoneInfo(zone_num: number): Promise<Settings>{
+    //return await this.settingsModel.findOne({zone: zone_num})
+    const zone_settings = this.settingsModel.findOne({zone: zone_num})
+    const current_zone_temp = this.getCurrentTempByZoneNum(zone_num)
+    return zone_settings
+
   }
 
-  async getCurrentTempByZoneNum(zone_num): Promise<number> {
-    const zone_settings = await this.settingsModel.findOne({ zone: zone_num });
-    const sensors = zone_settings.thermo_ids;
+  async getCurrentTempBySensors(sensors: number[]):Promise<number>{
     const tempReadingModelObj = this.tempReadingModel;
 
-    const temps = await Promise.all(sensors.map(async function(e: number): Promise<number> {
+    const temps: number[] = await Promise.all(sensors.map(async function(e: number): Promise<number> {
       const reading = await tempReadingModelObj.findOne({ thermo_id: e }).sort({ date: -1 });
       return reading.temp;
     }));
@@ -52,8 +56,23 @@ export class TemperaturesService {
     return Math.round(temps.reduce((a, b) => a + b, 0) / temps.length);
   }
 
+  async getCurrentTempByZoneNum(zone_num: number): Promise<number> {
+    const zone_settings = await this.settingsModel.findOne({ zone: zone_num });
+    const sensors = zone_settings.thermo_ids;
+    return await this.getCurrentTempBySensors(sensors)
+  }
+
   async getAllSettings(): Promise<Settings[]> {
     return await this.settingsModel.find().select(['-_id', '-__v']).exec();
+  }
+
+  async getHomeInfo():Promise<any>{
+    const zones = await this.getZoneNumbers()
+    console.log(zones)
+    const zone_info = await Promise.all(zones.map(this.getZoneInfo.bind(this)))
+    console.log(zone_info)
+
+    return [{"t":"1"}]
   }
 
 

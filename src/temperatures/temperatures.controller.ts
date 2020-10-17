@@ -6,13 +6,17 @@ export class TemperaturesController {
   constructor(private temperaturesService: TemperaturesService) { }
   @Get()
   async getReading() {
-    console.log("got request")
     return { "hi": 'hello world' }
+  }
+
+  @Get('/home')
+  async readHomeInfo(): Promise<JSON[]>{
+    return this.temperaturesService.getHomeInfo()
+
   }
 
   @Get('/all')
   async getAllReading() {
-    console.log('all')
     return this.temperaturesService.getTemps();
   }
 

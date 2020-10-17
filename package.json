@@ -28,6 +28,7 @@
     "@nestjs/mongoose": "^7.0.2",
     "@nestjs/platform-express": "^7.0.0",
     "@nestjs/swagger": "^4.6.1",
+    "lodash": "^4.17.20",
     "mongoose": "^5.10.9",
     "mqtt": "^4.2.1",
     "reflect-metadata": "^0.1.13",
