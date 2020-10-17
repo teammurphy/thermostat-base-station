@@ -33,15 +33,14 @@ export class TemperaturesService {
     // todo: add filter by disabled
     const zones = await this.settingsModel.find().select('zone').exec();
     return zones.map(function(e: Settings): number{
-      return e.zone;
+      return e.zone_number;
     })
   }
 
-  async getZoneInfo(zone_num: number): Promise<Settings>{
-    //return await this.settingsModel.findOne({zone: zone_num})
-    const zone_settings = this.settingsModel.findOne({zone: zone_num})
-    const current_zone_temp = this.getCurrentTempByZoneNum(zone_num)
-    return zone_settings
+  async getZoneInfo(zone_num: number): Promise<zoneinfoDTO>{
+    const zone_settings = await this.settingsModel.findOne({zone: zone_num})
+    const current_zone_temp = await this.getCurrentTempByZoneNum(zone_num)
+    return await zoneinfoDTO.createDTO(zone_settings, current_zone_temp)
 
   }
 
@@ -72,7 +71,7 @@ export class TemperaturesService {
     const zone_info = await Promise.all(zones.map(this.getZoneInfo.bind(this)))
     console.log(zone_info)
 
-    return [{"t":"1"}]
+    return zone_info
   }
 
 
