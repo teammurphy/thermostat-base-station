@@ -18,7 +18,18 @@ export class TemperaturesController {
 
   @Get('/all/settings')
   async getAllSettings() {
-    return this.temperaturesService.getAllSettings()
+    return this.temperaturesService.getAllSettings();
+  }
+
+  @Get('/zones')
+  async readZones():Promise<number[]>{
+    return this.temperaturesService.getZoneNumbers();
+
+  }
+
+  @Get('zone/:zone_num')
+  async readZoneInfo(@Param('zone_num') zone_num: number):Promise<any>{
+    return this.temperaturesService.getZoneInfo(zone_num)
   }
 
   @Get('/setTemp/zone/:zone_num')

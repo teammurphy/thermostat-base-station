@@ -5,6 +5,7 @@ import { TempReading } from '../sharedSchemes/interfaces/temp.interface';
 import { CreateTempDTO } from '../sharedSchemes/dto/create-temp.dto';
 import { Settings } from "../sharedSchemes/interfaces/settings.interface";
 import { CreateSettingsDTO } from "../sharedSchemes/dto/create-settings.dto";
+import { zoneinfoDTO } from '../sharedSchemes/dto/zoneinfo.dto';
 
 @Injectable()
 export class TemperaturesService {
@@ -24,6 +25,18 @@ export class TemperaturesService {
   async getSetTempbyZoneNum(zone_num): Promise<number> {
     const zone_settings = await this.settingsModel.findOne({ zone: zone_num });
     return zone_settings.set_temp;
+  }
+
+  async getZoneNumbers():Promise<number[]>{
+    // todo: add filter by disabled
+    const zones = await this.settingsModel.find().select('zone').exec();
+    return zones.map(function(e: Settings): number{
+      return e.zone;
+    })
+  }
+
+  async getZoneInfo(zone_num): Promise<Settings>{
+    return await this.settingsModel.findOne({zone: zone_num})
   }
 
   async getCurrentTempByZoneNum(zone_num): Promise<number> {
