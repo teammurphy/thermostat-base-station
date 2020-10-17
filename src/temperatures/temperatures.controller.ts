@@ -36,7 +36,7 @@ export class TemperaturesController {
     return this.temperaturesService.getZoneInfo(zone_num)
   }
 
-  @Get('/setTemp/zone/:zone_num')
+  @Get('/getSetTemp/zone/:zone_num')
   async readSetTempbyZoneNum(@Param('zone_num') zone_num: number): Promise<number> {
     return this.temperaturesService.getSetTempbyZoneNum(zone_num);
   }

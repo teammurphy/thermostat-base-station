@@ -25,20 +25,20 @@ export class TemperaturesService {
   }
 
   async getSetTempbyZoneNum(zone_num): Promise<number> {
-    const zone_settings = await this.settingsModel.findOne({ zone: zone_num });
+    const zone_settings = await this.settingsModel.findOne({ zone_number: zone_num });
     return zone_settings.set_temp;
   }
 
   async getZoneNumbers():Promise<number[]>{
     // todo: add filter by disabled
-    const zones = await this.settingsModel.find().select('zone').exec();
+    const zones = await this.settingsModel.find().select('zone_number').exec();
     return zones.map(function(e: Settings): number{
       return e.zone_number;
     })
   }
 
   async getZoneInfo(zone_num: number): Promise<zoneinfoDTO>{
-    const zone_settings = await this.settingsModel.findOne({zone: zone_num})
+    const zone_settings = await this.settingsModel.findOne({zone_number: zone_num})
     const current_zone_temp = await this.getCurrentTempByZoneNum(zone_num)
     return await zoneinfoDTO.createDTO(zone_settings, current_zone_temp)
 
@@ -56,7 +56,7 @@ export class TemperaturesService {
   }
 
   async getCurrentTempByZoneNum(zone_num: number): Promise<number> {
-    const zone_settings = await this.settingsModel.findOne({ zone: zone_num });
+    const zone_settings = await this.settingsModel.findOne({ zone_number: zone_num });
     const sensors = zone_settings.thermo_ids;
     return await this.getCurrentTempBySensors(sensors)
   }
@@ -67,9 +67,7 @@ export class TemperaturesService {
 
   async getHomeInfo():Promise<any>{
     const zones = await this.getZoneNumbers()
-    console.log(zones)
     const zone_info = await Promise.all(zones.map(this.getZoneInfo.bind(this)))
-    console.log(zone_info)
 
     return zone_info
   }
