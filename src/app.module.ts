@@ -8,7 +8,7 @@ import { TemperaturesModule } from './temperatures/temperatures.module';
 
 
 @Module({
-  imports: [ConfigModule.forRoot(), MongooseModule.forRoot(process.env.DATABASE_URL, { useFindAndModify: false }), ReadingModule, TemperaturesModule],
+  imports: [ConfigModule.forRoot(), MongooseModule.forRoot(process.env.DATABASE_URL, { useFindAndModify: false, debug: true }), ReadingModule, TemperaturesModule],
   controllers: [AppController],
   providers: [AppService],
 })

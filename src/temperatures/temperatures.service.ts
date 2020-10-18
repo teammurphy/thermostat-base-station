@@ -14,13 +14,6 @@ export class TemperaturesService {
     return await this.tempReadingModel.find().select(['-_id', '-__v']).exec();
   }
 
-  async getTemp(tempID): Promise<TempReading> {
-    const temp = await this.tempReadingModel
-      .findById(tempID)
-      .exec();
-    return temp;
-  }
-
   async getSetTempbyZoneNum(zone_num): Promise<number> {
     const zone_settings = await this.settingsModel.findOne({ zone_number: zone_num });
     return zone_settings.set_temp;
@@ -50,12 +43,16 @@ export class TemperaturesService {
 
     //todo: figure out how to filter by times
 
-    const temps: number[] = await Promise.all(sensors.map(async function(e: number): Promise<number> {
-      const reading = await tempReadingModelObj.findOne({ thermo_id: e }).sort({ date: -1 });
+    let temps: number[] = await Promise.all(sensors.map(async function(e: number): Promise<number> {
+      const reading = await tempReadingModelObj.findOne({ thermo_id: e}).sort({ date: -1 });
       if (reading != null){
         return reading.temp;
       }
     }));
+    temps = temps.filter(function(e){
+      return e != null
+    })
+
     return Math.round(temps.reduce((a, b) => a + b, 0) / temps.length);
   }
 
