@@ -29,7 +29,6 @@ export class TemperaturesController {
   @Get('/zones')
   async readZones():Promise<number[]>{
     return this.temperaturesService.getZoneNumbers();
-
   }
 
   @Get('zone/:zone_num')
@@ -57,9 +56,24 @@ export class TemperaturesController {
     return this.temperaturesService.addSensorsToZone(zone_num, body)
   }
 
-  @Put('editZone/zone/:zone_num')
-  async changeSetTemp(@Param('zone_num') zone_num:number, @Body() body: CreateZoneDTO):Promise<CreateZoneDTO>{
+  @Put('/editZone/zone/:zone_num')
+  async editZone(@Param('zone_num') zone_num:number, @Body() body: CreateZoneDTO):Promise<CreateZoneDTO>{
     return this.temperaturesService.editZone(zone_num, body)
+  }
+
+  @Put('/updateSetTemp/zone/:zone_num')
+  async updateSetTemp(@Param('zone_num') zone_num:number, @Body() body:JSON):Promise<CreateZoneDTO>{
+    return this.temperaturesService.editSetTemp(zone_num, body)
+  }
+
+  @Put('/updateHighTemp/zone/:zone_num')
+  async updateHighSet(@Param('zone_num') zone_num:number, @Body() body:JSON):Promise<CreateZoneDTO>{
+    return this.temperaturesService.editHighSet(zone_num, body)
+  }
+
+  @Put('/updateLowTemp/zone/:zone_num')
+  async updateLowSet(@Param('zone_num') zone_num:number, @Body() body:JSON):Promise<CreateZoneDTO>{
+    return this.temperaturesService.editLowSet(zone_num, body)
   }
 
   @Delete('/zone/:zone_num')

@@ -34,8 +34,8 @@ export class TemperaturesService {
   async getZoneInfo(zone_num: number): Promise<zoneinfoDTO>{
     const zone_settings = await this.settingsModel.findOne({zone_number: zone_num})
     const current_zone_temp = await this.getCurrentTempByZoneNum(zone_num)
-    return await zoneinfoDTO.createDTO(zone_settings, current_zone_temp)
 
+    return zoneinfoDTO.createDTO(zone_settings, current_zone_temp)
   }
 
   async getCurrentTempBySensors(sensors: number[]):Promise<number>{
@@ -102,5 +102,27 @@ export class TemperaturesService {
       new: true
     })
     return new_zone;
+  }
+
+  async editSetTemp(zone_num:number, new_set_temp:JSON): Promise<CreateZoneDTO>{
+    const new_zone: CreateZoneDTO = await this.settingsModel.findOneAndUpdate({zone_number:zone_num}, {set_temp:new_set_temp['set_temp']}, {
+      new: true
+    })
+    return new_zone
+  }
+
+
+  async editHighSet(zone_num:number, new_high_temp:JSON):Promise<CreateZoneDTO>{
+    const new_zone: CreateZoneDTO = await this.settingsModel.findOneAndUpdate({zone_number:zone_num}, {high_set:new_high_temp['high_set']}, {
+      new: true
+    })
+    return new_zone
+  }
+
+  async editLowSet(zone_num:number, new_low_temp:JSON):Promise<CreateZoneDTO>{
+    const new_zone: CreateZoneDTO = await this.settingsModel.findOneAndUpdate({zone_number:zone_num}, {high_set:new_low_temp['low_set']}, {
+      new: true
+    })
+    return new_zone
   }
 }
