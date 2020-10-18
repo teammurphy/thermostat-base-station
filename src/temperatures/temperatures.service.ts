@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { TempReading } from '../sharedSchemes/interfaces/temp.interface';
-import { CreateTempDTO } from '../sharedSchemes/dto/create-temp.dto';
 import { Settings } from "../sharedSchemes/interfaces/settings.interface";
 import { zoneinfoDTO } from '../sharedSchemes/dto/zoneinfo.dto';
 import { CreateZoneDTO } from '../sharedSchemes/dto/create-zone.dto'
@@ -49,11 +48,14 @@ export class TemperaturesService {
   async getCurrentTempBySensors(sensors: number[]):Promise<number>{
     const tempReadingModelObj = this.tempReadingModel;
 
+    //todo: figure out how to filter by times
+
     const temps: number[] = await Promise.all(sensors.map(async function(e: number): Promise<number> {
       const reading = await tempReadingModelObj.findOne({ thermo_id: e }).sort({ date: -1 });
-      return reading.temp;
+      if (reading != null){
+        return reading.temp;
+      }
     }));
-
     return Math.round(temps.reduce((a, b) => a + b, 0) / temps.length);
   }
 
@@ -105,17 +107,5 @@ export class TemperaturesService {
       new: true
     })
     return new_zone;
-  }
-
-  async editTemp(tempID, createTempDTO: CreateTempDTO): Promise<TempReading> {
-    const editedTemp = await this.tempReadingModel
-      .findByIdAndUpdate(tempID, createTempDTO, { new: true });
-    return editedTemp;
-  }
-
-  async deleteTemp(tempID): Promise<any> {
-    const deletedTemp = await this.tempReadingModel
-      .findByIdAndRemove(tempID);
-    return deletedTemp;
   }
 }
