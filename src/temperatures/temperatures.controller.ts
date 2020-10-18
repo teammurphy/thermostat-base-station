@@ -54,7 +54,12 @@ export class TemperaturesController {
 
   @Put('/addSensors/zone/:zone_num')
   async addSensors(@Param('zone_num') zone_num:number,@Body() body: [number]):Promise<zoneinfoDTO>{
-    return this.temperaturesService.addSensorsToZone(zone_num,body)
+    return this.temperaturesService.addSensorsToZone(zone_num, body)
+  }
+
+  @Put('editZone/zone/:zone_num')
+  async changeSetTemp(@Param('zone_num') zone_num:number, @Body() body: CreateZoneDTO):Promise<CreateZoneDTO>{
+    return this.temperaturesService.editZone(zone_num, body)
   }
 
   @Delete('/zone/:zone_num')

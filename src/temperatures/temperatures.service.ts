@@ -4,7 +4,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { TempReading } from '../sharedSchemes/interfaces/temp.interface';
 import { CreateTempDTO } from '../sharedSchemes/dto/create-temp.dto';
 import { Settings } from "../sharedSchemes/interfaces/settings.interface";
-import { CreateSettingsDTO } from "../sharedSchemes/dto/create-settings.dto";
 import { zoneinfoDTO } from '../sharedSchemes/dto/zoneinfo.dto';
 import { CreateZoneDTO } from '../sharedSchemes/dto/create-zone.dto'
 
@@ -34,6 +33,10 @@ export class TemperaturesService {
     return zones.map(function(e: Settings): number{
       return e.zone_number;
     })
+  }
+
+  async getZoneByNum(zone_num:number):Promise<Settings>{
+    return await this.settingsModel.findOne({zone_number: zone_num})
   }
 
   async getZoneInfo(zone_num: number): Promise<zoneinfoDTO>{
@@ -81,7 +84,7 @@ export class TemperaturesService {
 
   async deleteZone(zone_num: number):Promise<boolean>{
     //todo raise exceptions
-    try{
+    try{ 
       await this.settingsModel.findOneAndDelete({zone_number:zone_num})
     }
     catch(e){
@@ -97,6 +100,12 @@ export class TemperaturesService {
     return zone
   }
 
+  async editZone(zone_num:number, updated_zone:CreateZoneDTO):Promise<CreateZoneDTO>{
+    const new_zone:CreateZoneDTO = await this.settingsModel.findOneAndUpdate({zone_number:zone_num},updated_zone, {
+      new: true
+    })
+    return new_zone;
+  }
 
   async editTemp(tempID, createTempDTO: CreateTempDTO): Promise<TempReading> {
     const editedTemp = await this.tempReadingModel
