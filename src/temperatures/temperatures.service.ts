@@ -6,8 +6,7 @@ import { CreateTempDTO } from '../sharedSchemes/dto/create-temp.dto';
 import { Settings } from "../sharedSchemes/interfaces/settings.interface";
 import { CreateSettingsDTO } from "../sharedSchemes/dto/create-settings.dto";
 import { zoneinfoDTO } from '../sharedSchemes/dto/zoneinfo.dto';
-import  *  as _ from 'lodash';
-import { runInThisContext } from 'vm';
+import { CreateZoneDTO } from '../sharedSchemes/dto/create-zone.dto'
 
 @Injectable()
 export class TemperaturesService {
@@ -70,6 +69,25 @@ export class TemperaturesService {
     const zone_info = await Promise.all(zones.map(this.getZoneInfo.bind(this)))
 
     return zone_info
+  }
+
+  async createZone(zone_info: CreateZoneDTO):Promise<CreateZoneDTO>{
+    const new_zone = new this.settingsModel(zone_info)
+    new_zone.save(function (err){
+      if (err) return console.error(err);
+    })
+    return zone_info
+  }
+
+  async deleteZone(zone_num: number):Promise<boolean>{
+    try{
+      await this.settingsModel.findOneAndDelete({zone_number:zone_num})
+    }
+    catch(e){
+      return false
+    }
+
+    return true
   }
 
 

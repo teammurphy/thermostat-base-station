@@ -1,5 +1,6 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { TemperaturesService } from './temperatures.service';
+import { CreateZoneDTO } from '../sharedSchemes/dto/create-zone.dto'
 
 @Controller('temperatures')
 export class TemperaturesController {
@@ -12,7 +13,6 @@ export class TemperaturesController {
   @Get('/home')
   async readHomeInfo(): Promise<JSON[]>{
     return this.temperaturesService.getHomeInfo()
-
   }
 
   @Get('/all')
@@ -44,5 +44,15 @@ export class TemperaturesController {
   @Get('/getTemp/zone/:zone_num')
   async readTempbyZoneNum(@Param('zone_num') zone_num: number): Promise<number> {
     return this.temperaturesService.getCurrentTempByZoneNum(zone_num);
+  }
+
+  @Post('/zone')
+  async createZone(@Body() body: CreateZoneDTO): Promise<CreateZoneDTO>{
+    return this.temperaturesService.createZone(body)
+  }
+
+  @Delete('/zone/:zone_num')
+  async deleteZoneByNum(@Param('zone_num') zone_num: number):Promise<boolean>{
+    return this.temperaturesService.deleteZone(zone_num)
   }
 }
