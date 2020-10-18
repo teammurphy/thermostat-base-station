@@ -42,7 +42,7 @@ export class TemperaturesService {
     const tempReadingModelObj = this.tempReadingModel;
 
     let temps: number[] = await Promise.all(sensors.map(async function(e: number): Promise<number> {
-      const reading = await tempReadingModelObj.findOne({ thermo_id: e, date: {"$gte":new Date(Date.now() - 60*60 *1000) }}).sort({ date: -1 });
+      const reading = await tempReadingModelObj.findOne({ thermo_id: e, date: {"$gte":new Date(Date.now() - (15*60*1000)) }}).sort({ date: -1 });
       if (reading != null){
         return reading.temp;
       }
