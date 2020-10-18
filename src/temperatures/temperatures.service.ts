@@ -66,7 +66,7 @@ export class TemperaturesService {
 
   async getHomeInfo():Promise<any>{
     const zones = await this.getZoneNumbers()
-    const zone_info = await Promise.all(zones.map(this.getZoneInfo.bind(this)))
+    const zone_info: any = await Promise.all(zones.map(this.getZoneInfo.bind(this)))
 
     return zone_info
   }
@@ -80,14 +80,21 @@ export class TemperaturesService {
   }
 
   async deleteZone(zone_num: number):Promise<boolean>{
+    //todo raise exceptions
     try{
       await this.settingsModel.findOneAndDelete({zone_number:zone_num})
     }
     catch(e){
       return false
     }
-
     return true
+  }
+
+  async addSensorsToZone(zone_num:number,sensor_ids:[number]):Promise<any>{
+    const zone = await this.settingsModel.findOne({zone_number: zone_num})
+    zone.thermo_ids = sensor_ids
+    await zone.save()
+    return zone
   }
 
 

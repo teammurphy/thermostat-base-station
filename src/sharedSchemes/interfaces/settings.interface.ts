@@ -1,10 +1,10 @@
 import { Document } from 'mongoose';
 
 export interface Settings extends Document {
-  readonly zone_number: number,
-  readonly zone_name: string,
-  readonly high_set: number,
-  readonly low_set: number,
-  readonly set_temp: number
-  readonly thermo_ids: [number]
+  zone_number: number,
+  zone_name: string,
+  high_set: number,
+  low_set: number,
+  set_temp: number
+  thermo_ids: [number]
 }
