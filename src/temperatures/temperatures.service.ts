@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { TempReading } from '../sharedSchemes/interfaces/temp.interface';
 import { Settings } from "../sharedSchemes/interfaces/settings.interface";
 import { zoneinfoDTO } from '../sharedSchemes/dto/zoneinfo.dto';
-import { CreateZoneDTO } from '../sharedSchemes/dto/create-zone.dto'
+import { CreateZoneDTO } from '../sharedSchemes/dto/create-zone.dto';
 
 @Injectable()
 export class TemperaturesService {
@@ -41,16 +41,14 @@ export class TemperaturesService {
   async getCurrentTempBySensors(sensors: number[]):Promise<number>{
     const tempReadingModelObj = this.tempReadingModel;
 
-    //todo: figure out how to filter by times
-
     let temps: number[] = await Promise.all(sensors.map(async function(e: number): Promise<number> {
-      const reading = await tempReadingModelObj.findOne({ thermo_id: e}).sort({ date: -1 });
+      const reading = await tempReadingModelObj.findOne({ thermo_id: e, date: {"$gte":new Date(Date.now() - 1000*60*60 *1000) }}).sort({ date: -1 });
       if (reading != null){
         return reading.temp;
       }
     }));
     temps = temps.filter(function(e){
-      return e != null
+      return e != null;
     })
 
     return Math.round(temps.reduce((a, b) => a + b, 0) / temps.length);
