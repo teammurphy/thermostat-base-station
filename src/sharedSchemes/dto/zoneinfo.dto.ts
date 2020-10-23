@@ -2,7 +2,7 @@ export class zoneinfoDTO{
     zone_number: number;
     zone_name: string;
     current_temp: number;
-    set_temp: number;
+    set_temps: [];
     low_set: number;
     high_set: number;
 
@@ -10,7 +10,6 @@ export class zoneinfoDTO{
         const newDTO = new zoneinfoDTO();
         newDTO.zone_number = zone_setting.zone_number;
         newDTO.zone_name = zone_setting.zone_name;
-        newDTO.set_temp = zone_setting.set_temp;
         newDTO.low_set = zone_setting.low_set;
         newDTO.high_set = zone_setting.high_set;
 

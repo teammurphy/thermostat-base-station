@@ -3,20 +3,26 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { TempReading } from '../sharedSchemes/interfaces/temp.interface';
 import { Settings } from "../sharedSchemes/interfaces/settings.interface";
+import { SetTemps } from "../sharedSchemes/interfaces/setTemps.interface";
 import { zoneinfoDTO } from '../sharedSchemes/dto/zoneinfo.dto';
 import { CreateZoneDTO } from '../sharedSchemes/dto/create-zone.dto';
 
 @Injectable()
 export class TemperaturesService {
-  constructor(@InjectModel('TempReading') private readonly tempReadingModel: Model<TempReading>, @InjectModel('Settings') private readonly settingsModel: Model<Settings>) { }
+  constructor(@InjectModel('TempReading') private readonly tempReadingModel: Model<TempReading>, 
+  @InjectModel('Settings') private readonly settingsModel: Model<Settings>, 
+  @InjectModel('SetTemps') private readonly setTempModel:Model<SetTemps>) { }
 
   async getTemps(): Promise<TempReading[]> {
     return await this.tempReadingModel.find().select(['-_id', '-__v']).exec();
   }
 
-  async getSetTempbyZoneNum(zone_num): Promise<number> {
+  async getSetTempbyZoneNum(zone_num:number): Promise<number> {
+    //todo figure out whitch time it is in
     const zone_settings = await this.settingsModel.findOne({ zone_number: zone_num });
-    return zone_settings.set_temp;
+    const currernt_temp = await zone_settings.set_temps
+    console.log(currernt_temp[0]);
+    return currernt_temp[0]['set_temp'];
   }
 
   async getZoneNumbers():Promise<number[]>{
@@ -120,7 +126,7 @@ export class TemperaturesService {
   }
 
   async editLowSet(zone_num:number, new_low_temp:JSON):Promise<CreateZoneDTO>{
-    const new_zone: CreateZoneDTO = await this.settingsModel.findOneAndUpdate({zone_number:zone_num}, {high_set:new_low_temp['low_set']}, {
+    const new_zone: CreateZoneDTO = await this.settingsModel.findOneAndUpdate({zone_number:zone_num}, {low_set:new_low_temp['low_set']}, {
       new: true
     })
     return new_zone
