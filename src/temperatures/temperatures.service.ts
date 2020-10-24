@@ -1,3 +1,4 @@
+/*
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -5,7 +6,7 @@ import { TempReading } from '../sharedSchemes/interfaces/temp.interface';
 import { Settings } from "../sharedSchemes/interfaces/settings.interface";
 import { SetTemps } from "../sharedSchemes/interfaces/setTemps.interface";
 import { zoneinfoDTO } from '../sharedSchemes/dto/zoneinfo.dto';
-import { CreateZoneDTO } from '../sharedSchemes/dto/create-zone.dto';
+import { CreateZoneDTO } from '../sharedSchemes/dto/zone.dto';
 
 @Injectable()
 export class TemperaturesService {
@@ -132,3 +133,4 @@ export class TemperaturesService {
     return new_zone
   }
 }
+*/

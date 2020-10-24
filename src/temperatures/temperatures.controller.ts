@@ -1,3 +1,5 @@
+/*
+
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { TemperaturesService } from './temperatures.service';
 import { CreateZoneDTO } from '../sharedSchemes/dto/create-zone.dto'
@@ -81,3 +83,5 @@ export class TemperaturesController {
     return this.temperaturesService.deleteZone(zone_num)
   }
 }
+
+*/

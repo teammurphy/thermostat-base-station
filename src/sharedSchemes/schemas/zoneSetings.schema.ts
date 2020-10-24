@@ -1,7 +1,8 @@
 import * as mongoose from 'mongoose';
-import {SetTempsSchema} from './setTemp.schema'
 
-export const SettingsSchema = new mongoose.Schema({
+import {SetTempsSchema} from './setTemps.schema'
+
+export const ZoneSettingsSchema = new mongoose.Schema({
   zone_number: { type: Number, unique: true },
   zone_name: String,
   high_set: Number,
@@ -10,4 +11,4 @@ export const SettingsSchema = new mongoose.Schema({
   thermo_ids: [Number]
 
 },
-  { collection: 'settings' })
+  { collection: 'zoneSettings' })

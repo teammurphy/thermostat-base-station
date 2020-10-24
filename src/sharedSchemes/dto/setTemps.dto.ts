@@ -1,4 +1,4 @@
-export class CreateTempDTO {
+export class CreateSetTempsDTO {
   readonly thermo_id: number;
   readonly thermo_name: string;
   readonly date: Date;
