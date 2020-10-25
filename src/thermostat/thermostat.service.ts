@@ -68,9 +68,15 @@ export class ThermostatService {
         .valueOf();
 
     const set_temps = zone_info.set_temps;
+    console.log(set_temps);
+
+    if (set_temps.length == 0) {
+      //TODO - raise real error
+      return -99;
+    }
 
     const filtered_temps = set_temps.filter(
-      // retunrs list where the current time is withing the range of set temps start and end
+      // returns list where the current time is withing the range of set temps start and end
       temp => {
         return temp.start_time <= currentTime && currentTime <= temp.end_time;
       },
@@ -113,13 +119,12 @@ export class ThermostatService {
   }
 
   async getHomeInfo(): Promise<ZoneSettingsDTO[]> {
-    //const zones = await this.getZoneNumbers();
+    const zones = await this.getZoneNumbers();
 
-    //const zone_info: any = await Promise.all(
-    //  zones.map(this.getZoneInfo.bind(this)),
-    //);
-    const zone_info = await this.getZoneInfo(1);
+    const zone_info: any = await Promise.all(
+      zones.map(this.getZoneInfo.bind(this)),
+    );
 
-    return [zone_info];
+    return zone_info;
   }
 }
