@@ -9,7 +9,7 @@ import { ThermostatModule } from './thermostat/thermostat.module';
 
 @Module({
   imports: [ConfigModule.forRoot(), 
-    MongooseModule.forRoot(process.env.DATABASE_URL, { useFindAndModify: false, debug: true }), 
+    MongooseModule.forRoot(process.env.DATABASE_URL, { useFindAndModify: false,useNewUrlParser: true, useCreateIndex: true }),
     SensorReadingModule, 
     ThermostatModule],
   //review maybe have to put thermosta contoller and moudule back

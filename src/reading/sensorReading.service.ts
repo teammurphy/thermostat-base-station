@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { SensorReading } from '../sharedSchemes/interfaces/sensorReading.interface';
+import { SensorReadings } from '../sharedSchemes/interfaces/sensorReadings.interface';
 import { CreateSensorReadingDTO } from '../sharedSchemes/dto/sensorReading.dto';
 
 
 @Injectable()
 export class SensorReadingService {
 
-  constructor(@InjectModel('SensorReading') private readonly sensorReadingModel: Model<SensorReading>) { }
+  constructor(@InjectModel('SensorReading') private readonly sensorReadingModel: Model<SensorReadings>) { }
 
 
   async addTemp(data: CreateSensorReadingDTO) {

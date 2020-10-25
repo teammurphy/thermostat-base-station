@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 
-export const SensorReadingSchema = new mongoose.Schema({
-    sensor_id: {type: Number, unique:true},
+export const SensorReadingsSchema = new mongoose.Schema({
+    sensor_id: {type: Number, unique: true},
     sensor_name: String,
     timestamp: Date,
     temperature: Number
