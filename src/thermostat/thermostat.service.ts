@@ -17,8 +17,17 @@ export class ThermostatService {
     private readonly sensorsReadingModel: Model<SensorReadings>,
   ) {}
 
+  getTimeSinceMidnight(): number {
+    return (
+      moment().valueOf() -
+      moment()
+        .startOf('day')
+        .valueOf()
+    );
+  }
+
   async getZoneNumbers(): Promise<number[]> {
-    // todo: add filter by disabled
+    // TODO: add filter by disabled
     const zones = await this.zoneSettingsModel
       .find()
       .select('zone_number')
@@ -55,20 +64,15 @@ export class ThermostatService {
     const zone_settings = await this.zoneSettingsModel.findOne({
       zone_number: zone_num,
     });
-    const sensors = zone_settings.thermo_ids;
+    const sensors = zone_settings.sensor_ids;
     return await this.getCurrentTempBySensors(sensors);
   }
 
-  async getCurrentSetTempByZone(zone_info: ZoneSettings): Promise<number> {
+  async getCurrentSetTempByZone(zone_num: number): Promise<number> {
     //current time in millisecods since midnight
-    const currentTime =
-      moment().valueOf() -
-      moment()
-        .startOf('day')
-        .valueOf();
+    const currentTime = this.getTimeSinceMidnight();
 
-    const set_temps = zone_info.set_temps;
-    console.log(set_temps);
+    const set_temps = await this.setTempsModel.find({ zone_number: zone_num });
 
     if (set_temps.length == 0) {
       //TODO - raise real error
@@ -108,7 +112,7 @@ export class ThermostatService {
     });
     const current_zone_temp = await this.getCurrentTempByZoneNum(zone_num);
     const current_zone_set_temp = await this.getCurrentSetTempByZone(
-      zone_settings,
+      zone_settings.zone_number,
     );
 
     return ZoneSettingsDTO.createDTO(
@@ -126,5 +130,66 @@ export class ThermostatService {
     );
 
     return zone_info;
+  }
+
+  async addSensorsToZone(
+    zone_num: number,
+    sensor_ids: number[],
+  ): Promise<ZoneSettingsDTO> {
+    const zone = await this.zoneSettingsModel.findOne({
+      zone_number: zone_num,
+    });
+    zone.sensor_ids = sensor_ids;
+    await zone.save();
+    return await this.getZoneInfo(zone_num);
+  }
+
+  async bumpSetTemp(
+    zone_num: number,
+    new_set_temp: JSON,
+  ): Promise<ZoneSettingsDTO> {
+    const millseconds_in_hour = 3600000;
+    const new_temp = new this.setTempsModel();
+    const currentTime = this.getTimeSinceMidnight();
+
+    new_temp.set_temp = new_set_temp['set_temp'];
+    new_temp.start_time = currentTime;
+    new_temp.end_time = currentTime + millseconds_in_hour;
+
+    const dateTimeNow = new Date();
+    new_temp.expireAt = new Date(
+      dateTimeNow.setHours(dateTimeNow.getHours() + 1),
+    );
+    await new_temp.save();
+
+    return await this.getZoneInfo(zone_num);
+  }
+
+  async editHighSet(
+    zone_num: number,
+    new_high_temp: JSON,
+  ): Promise<ZoneSettingsDTO> {
+    await this.zoneSettingsModel.findOneAndUpdate(
+      { zone_number: zone_num },
+      { high_set: new_high_temp['high_set'] },
+      {
+        new: true,
+      },
+    );
+    return await this.getZoneInfo(zone_num);
+  }
+
+  async editLowSet(
+    zone_num: number,
+    new_low_temp: JSON,
+  ): Promise<ZoneSettingsDTO> {
+    await this.zoneSettingsModel.findOneAndUpdate(
+      { zone_number: zone_num },
+      { low_set: new_low_temp['low_set'] },
+      {
+        new: true,
+      },
+    );
+    return await this.getZoneInfo(zone_num);
   }
 }
