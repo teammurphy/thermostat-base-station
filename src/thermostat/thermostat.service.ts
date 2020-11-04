@@ -152,6 +152,7 @@ export class ThermostatService {
     const new_temp = new this.setTempsModel();
     const currentTime = this.getTimeSinceMidnight();
 
+    new_temp.zone_number = zone_num;
     new_temp.set_temp = new_set_temp['set_temp'];
     new_temp.start_time = currentTime;
     new_temp.end_time = currentTime + millseconds_in_hour;
