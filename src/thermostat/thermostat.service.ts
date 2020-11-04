@@ -72,21 +72,18 @@ export class ThermostatService {
     //current time in millisecods since midnight
     const currentTime = this.getTimeSinceMidnight();
 
-    const set_temps = await this.setTempsModel.find({ zone_number: zone_num });
+    const set_temps = await this.setTempsModel.find({
+      zone_number: zone_num,
+      start_time: { $lt: currentTime },
+      end_time: { $gt: currentTime },
+    });
 
     if (set_temps.length == 0) {
       //TODO - raise real error
       return -99;
     }
 
-    const filtered_temps = set_temps.filter(
-      // returns list where the current time is withing the range of set temps start and end
-      temp => {
-        return temp.start_time <= currentTime && currentTime <= temp.end_time;
-      },
-    );
-
-    const filtered_zone_info = filtered_temps.map(temp => ({
+    const filtered_zone_info = set_temps.map(temp => ({
       //gets the range of each set temp, how long is each range
       range: temp['end_time'] - temp['start_time'],
       set_temp: temp['set_temp'],
@@ -146,7 +143,7 @@ export class ThermostatService {
 
   async bumpSetTemp(
     zone_num: number,
-    new_set_temp: JSON,
+    new_set_temp: { set_temp: number },
   ): Promise<ZoneSettingsDTO> {
     const millseconds_in_hour = 3600000;
     const new_temp = new this.setTempsModel();

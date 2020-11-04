@@ -27,9 +27,8 @@ export class ThermostatController {
   @Put('/bumpSetTemp')
   async updateSetTemp(
     @Query('zone_num') zone_num: number,
-    @Body() body: JSON,
+    @Body() body: { set_temp: number },
   ): Promise<ZoneSettingsDTO> {
-    console.log(body);
     return this.thermostatService.bumpSetTemp(zone_num, body);
   }
 
