@@ -17,7 +17,7 @@ export class ThermostatService {
     private readonly sensorsReadingModel: Model<SensorReadings>,
   ) {}
 
-  getTimeSinceMidnight(): number {
+  getMillSecSinceMidnight(): number {
     return (
       moment().valueOf() -
       moment()
@@ -41,10 +41,10 @@ export class ThermostatService {
     const tempReadingModelObj = this.sensorsReadingModel;
 
     let temps: number[] = await Promise.all(
-      sensors.map(async function(e: number): Promise<number> {
+      sensors.map(async function(sensor_num: number): Promise<number> {
         const reading = await tempReadingModelObj
           .findOne({
-            sensor_id: e,
+            sensor_id: sensor_num,
             timestamp: { $gte: new Date(Date.now() - 15 * 60 * 1000) },
           })
           .sort({ timestamp: -1 });
@@ -69,38 +69,27 @@ export class ThermostatService {
   }
 
   async getCurrentSetTempByZone(zone_num: number): Promise<number> {
-    //current time in millisecods since midnight
-    const currentTime = this.getTimeSinceMidnight();
+    const millisec_since_midnight = this.getMillSecSinceMidnight();
 
-    const set_temps = await this.setTempsModel.find({
-      zone_number: zone_num,
-      start_time: { $lt: currentTime },
-      end_time: { $gt: currentTime },
-    });
+    const set_temps = await this.setTempsModel.aggregate([
+      {
+        $match: {
+          zone_number: zone_num,
+          start_time: { $lt: millisec_since_midnight },
+          end_time: { $gt: millisec_since_midnight },
+        },
+      },
+      {
+        $project: {
+          set_temp: 1,
+          range: { $subtract: ['$end_time', '$start_time'] },
+        },
+      },
+      { $sort: { range: -1 } },
+      { $limit: 1 },
+    ]);
 
-    if (set_temps.length == 0) {
-      //TODO - raise real error
-      return -99;
-    }
-
-    const filtered_zone_info = set_temps.map(temp => ({
-      //gets the range of each set temp, how long is each range
-      range: temp['end_time'] - temp['start_time'],
-      set_temp: temp['set_temp'],
-    }));
-
-    const current_set_temp_range = Math.min.apply(
-      //find the most specefic range from the list
-      null,
-      filtered_zone_info.map(ranger => ranger.range),
-    );
-
-    const current_set_temp = filtered_zone_info.find(
-      //matches the min range to the temp and reterns the temp
-      zone_info => zone_info['range'] == current_set_temp_range,
-    ).set_temp;
-
-    return current_set_temp;
+    return set_temps[0]['set_temp'];
   }
 
   async getZoneInfo(zone_num: number): Promise<ZoneSettingsDTO> {
@@ -147,12 +136,12 @@ export class ThermostatService {
   ): Promise<ZoneSettingsDTO> {
     const millseconds_in_hour = 3600000;
     const new_temp = new this.setTempsModel();
-    const currentTime = this.getTimeSinceMidnight();
+    const mill_since_midnight = this.getMillSecSinceMidnight();
 
     new_temp.zone_number = zone_num;
     new_temp.set_temp = new_set_temp['set_temp'];
-    new_temp.start_time = currentTime;
-    new_temp.end_time = currentTime + millseconds_in_hour;
+    new_temp.start_time = mill_since_midnight;
+    new_temp.end_time = mill_since_midnight + millseconds_in_hour;
 
     const dateTimeNow = new Date();
     new_temp.expireAt = new Date(
