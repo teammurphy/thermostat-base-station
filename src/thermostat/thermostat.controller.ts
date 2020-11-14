@@ -19,7 +19,6 @@ export class ThermostatController {
 
   @Post('/addZone')
   async addZone(@Body() body: ZoneSettingsDTO): Promise<boolean> {
-    console.log(body);
     return this.thermostatService.addZone(body);
   }
 

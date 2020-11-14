@@ -128,6 +128,22 @@ export class ThermostatService {
     return await this.getZoneInfo(zone_num);
   }
 
+  async editSetTemp(
+    zone_num: number,
+    new_set_temp: number,
+    start_time: number,
+    end_time: number,
+  ) {
+    const new_temp = new this.setTempsModel();
+
+    new_temp.zone_number = zone_num;
+    new_temp.set_temp = new_set_temp;
+    new_temp.start_time = start_time;
+    new_temp.end_time = end_time;
+
+    await new_temp.save();
+  }
+
   async bumpSetTemp(
     zone_num: number,
     new_set_temp: { set_temp: number },
@@ -180,8 +196,12 @@ export class ThermostatService {
 
   async addZone(zoneSettings: ZoneSettingsDTO): Promise<boolean> {
     // TODO error and return stuff
+    const set_temp: number = zoneSettings['set_temp'];
+    delete zoneSettings[set_temp];
+    const millsecinday = 86400000;
+    this.editSetTemp(zoneSettings['zone_number'], set_temp, 0, millsecinday);
+
     const new_zone = new this.zoneSettingsModel(zoneSettings);
-    console.log(new_zone);
     new_zone.save(function(err) {
       if (err) return console.error(err);
     });
