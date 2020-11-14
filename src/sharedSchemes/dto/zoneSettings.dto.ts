@@ -5,7 +5,7 @@ export class ZoneSettingsDTO {
   high_set: number;
   low_set: number;
   set_temp: number;
-  thermo_ids: number[];
+  sensor_ids: number[];
 
   public static createDTO(
     zone_setting,

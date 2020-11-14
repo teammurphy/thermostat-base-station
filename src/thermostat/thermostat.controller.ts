@@ -1,4 +1,5 @@
-import { Controller, Get, Put, Query, Body } from '@nestjs/common';
+import { Controller, Get, Put, Query, Body, Post } from '@nestjs/common';
+import { type } from 'os';
 import { ZoneSettingsDTO } from 'src/sharedSchemes/dto/zoneSettings.dto';
 import { ThermostatService } from './thermostat.service';
 
@@ -14,6 +15,12 @@ export class ThermostatController {
   @Get('/home')
   async readHomeInfo(): Promise<ZoneSettingsDTO[]> {
     return this.thermostatService.getHomeInfo();
+  }
+
+  @Post('/addZone')
+  async addZone(@Body() body: ZoneSettingsDTO): Promise<boolean> {
+    console.log(body);
+    return this.thermostatService.addZone(body);
   }
 
   @Put('/addSensors')

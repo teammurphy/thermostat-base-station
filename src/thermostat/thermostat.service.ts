@@ -28,15 +28,13 @@ export class ThermostatService {
 
   async getZoneNumbers(): Promise<number[]> {
     // TODO: add filter by disabled
-    const zones = await this.zoneSettingsModel
-      .find()
-      .select('zone_number')
-      .exec();
+    const zones = await this.zoneSettingsModel.find();
 
     return zones.map(function(e: ZoneSettings): number {
       return e.zone_number;
     });
   }
+
   async getCurrentTempBySensors(sensors: number[]): Promise<number> {
     const tempReadingModelObj = this.sensorsReadingModel;
 
@@ -48,6 +46,7 @@ export class ThermostatService {
             timestamp: { $gte: new Date(Date.now() - 15 * 60 * 1000) },
           })
           .sort({ timestamp: -1 });
+
         if (reading != null) {
           return reading.temperature;
         }
@@ -86,7 +85,6 @@ export class ThermostatService {
         },
       },
       { $sort: { range: -1 } },
-      { $limit: 1 },
     ]);
 
     return set_temps[0]['set_temp'];
@@ -178,5 +176,15 @@ export class ThermostatService {
       },
     );
     return await this.getZoneInfo(zone_num);
+  }
+
+  async addZone(zoneSettings: ZoneSettingsDTO): Promise<boolean> {
+    // TODO error and return stuff
+    const new_zone = new this.zoneSettingsModel(zoneSettings);
+    console.log(new_zone);
+    new_zone.save(function(err) {
+      if (err) return console.error(err);
+    });
+    return true;
   }
 }
