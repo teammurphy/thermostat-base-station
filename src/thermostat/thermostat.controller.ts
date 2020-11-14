@@ -1,5 +1,4 @@
 import { Controller, Get, Put, Query, Body, Post } from '@nestjs/common';
-import { type } from 'os';
 import { ZoneSettingsDTO } from 'src/sharedSchemes/dto/zoneSettings.dto';
 import { ThermostatService } from './thermostat.service';
 

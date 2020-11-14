@@ -133,6 +133,7 @@ export class ThermostatService {
     new_set_temp: number,
     start_time: number,
     end_time: number,
+    expireAt?: Date,
   ) {
     const new_temp = new this.setTempsModel();
 
@@ -140,6 +141,10 @@ export class ThermostatService {
     new_temp.set_temp = new_set_temp;
     new_temp.start_time = start_time;
     new_temp.end_time = end_time;
+
+    if (typeof expireAt == 'undefined') {
+      new_temp.expireAt = expireAt;
+    }
 
     await new_temp.save();
   }
@@ -149,19 +154,21 @@ export class ThermostatService {
     new_set_temp: { set_temp: number },
   ): Promise<ZoneSettingsDTO> {
     const millseconds_in_hour = 3600000;
-    const new_temp = new this.setTempsModel();
     const mill_since_midnight = this.getMillSecSinceMidnight();
-
-    new_temp.zone_number = zone_num;
-    new_temp.set_temp = new_set_temp['set_temp'];
-    new_temp.start_time = mill_since_midnight;
-    new_temp.end_time = mill_since_midnight + millseconds_in_hour;
+    const t_plus_hour = mill_since_midnight + millseconds_in_hour;
 
     const dateTimeNow = new Date();
-    new_temp.expireAt = new Date(
+    const expire_date_time = new Date(
       dateTimeNow.setHours(dateTimeNow.getHours() + 1),
     );
-    await new_temp.save();
+
+    await this.editSetTemp(
+      zone_num,
+      new_set_temp['set_temp'],
+      mill_since_midnight,
+      t_plus_hour,
+      expire_date_time,
+    );
 
     return await this.getZoneInfo(zone_num);
   }
