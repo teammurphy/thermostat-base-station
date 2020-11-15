@@ -84,7 +84,7 @@ export class ThermostatService {
           range: { $subtract: ['$end_time', '$start_time'] },
         },
       },
-      { $sort: { range: -1 } },
+      { $sort: { range: 1 } },
     ]);
 
     return set_temps[0]['set_temp'];
@@ -142,7 +142,7 @@ export class ThermostatService {
     new_temp.start_time = start_time;
     new_temp.end_time = end_time;
 
-    if (typeof expireAt == 'undefined') {
+    if (typeof expireAt != 'undefined') {
       new_temp.expireAt = expireAt;
     }
 
@@ -160,6 +160,15 @@ export class ThermostatService {
     const dateTimeNow = new Date();
     const expire_date_time = new Date(
       dateTimeNow.setHours(dateTimeNow.getHours() + 1),
+    );
+
+    await this.setTempsModel.deleteMany(
+      { zone_number: zone_num, expireAt: { $exists: true } },
+      function(err) {
+        if (err) {
+          console.log(err);
+        }
+      },
     );
 
     await this.editSetTemp(
