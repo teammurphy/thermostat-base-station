@@ -18,13 +18,16 @@ export class ThermostatService {
     private readonly sensorsReadingModel: Model<SensorReadings>,
   ) {}
 
-  getMillSecSinceMidnight(): number {
-    return (
+  getSecSinceMidnight(): number {
+    /* return (
       moment().valueOf() -
       moment()
         .startOf('day')
         .valueOf()
-    );
+    ); */
+    const mmt = moment();
+    const mmtMidnight = mmt.clone().startOf('day');
+    return mmt.diff(mmtMidnight, 'seconds');
   }
 
   async getZoneNumbers(): Promise<number[]> {
@@ -78,12 +81,12 @@ export class ThermostatService {
   }
 
   async getCurrentSetTempByZone(zone_num: number): Promise<number> {
-    const millisec_since_midnight = this.getMillSecSinceMidnight();
+    const sec_since_midnight = this.getSecSinceMidnight();
 
     const set_temp = await this.setTempsModel
       .findOne({
         zone_number: zone_num,
-        start_time: { $lt: millisec_since_midnight },
+        start_time: { $lt: sec_since_midnight },
       })
       .sort({ start_time: -1 })
       .exec();
@@ -152,7 +155,7 @@ export class ThermostatService {
     zone_num: number,
     new_set_temp: { set_temp: number },
   ): Promise<ZoneSettingsDTO> {
-    const mill_since_midnight = this.getMillSecSinceMidnight();
+    const mill_since_midnight = this.getSecSinceMidnight();
 
     const dateTimeNow = new Date();
     const expire_date_time = new Date(
