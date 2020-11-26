@@ -19,12 +19,6 @@ export class ThermostatService {
   ) {}
 
   getSecSinceMidnight(): number {
-    /* return (
-      moment().valueOf() -
-      moment()
-        .startOf('day')
-        .valueOf()
-    ); */
     const mmt = moment();
     const mmtMidnight = mmt.clone().startOf('day');
     return mmt.diff(mmtMidnight, 'seconds');
