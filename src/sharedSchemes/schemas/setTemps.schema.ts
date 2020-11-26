@@ -5,7 +5,6 @@ export const SetTempsSchema = new mongoose.Schema(
     zone_number: Number,
     set_temp: Number,
     start_time: Number,
-    end_time: Number,
     expireAt: Date,
   },
   { timestamps: true, collection: 'setTemps' },

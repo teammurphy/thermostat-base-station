@@ -5,6 +5,7 @@ import { ZoneSettings } from '../sharedSchemes/interfaces/zoneSettings.interface
 import { SetTemps } from '../sharedSchemes/interfaces/setTemps.interface';
 import { SensorReadings } from '../sharedSchemes/interfaces/sensorReadings.interface';
 import { ZoneSettingsDTO } from '../sharedSchemes/dto/zoneSettings.dto';
+import { SetTempsDTO } from '../sharedSchemes/dto/setTemps.dto';
 import * as moment from 'moment';
 
 @Injectable()
@@ -67,27 +68,27 @@ export class ThermostatService {
     return await this.getCurrentTempBySensors(sensors);
   }
 
+  async getSetTempsByZone(zone_num: number): Promise<SetTempsDTO[]> {
+    // TODO - Format time
+    const set_temps = await this.setTempsModel.find(
+      { zone_number: zone_num },
+      { start_time: 1, set_temp: 1, _id: 0 },
+    );
+    return set_temps;
+  }
+
   async getCurrentSetTempByZone(zone_num: number): Promise<number> {
     const millisec_since_midnight = this.getMillSecSinceMidnight();
 
-    const set_temps = await this.setTempsModel.aggregate([
-      {
-        $match: {
-          zone_number: zone_num,
-          start_time: { $lt: millisec_since_midnight },
-          end_time: { $gt: millisec_since_midnight },
-        },
-      },
-      {
-        $project: {
-          set_temp: 1,
-          range: { $subtract: ['$end_time', '$start_time'] },
-        },
-      },
-      { $sort: { range: 1 } },
-    ]);
+    const set_temp = await this.setTempsModel
+      .findOne({
+        zone_number: zone_num,
+        start_time: { $lt: millisec_since_midnight },
+      })
+      .sort({ start_time: -1 })
+      .exec();
 
-    return set_temps[0]['set_temp'];
+    return set_temp['set_temp'];
   }
 
   async getZoneInfo(zone_num: number): Promise<ZoneSettingsDTO> {
@@ -132,7 +133,6 @@ export class ThermostatService {
     zone_num: number,
     new_set_temp: number,
     start_time: number,
-    end_time: number,
     expireAt?: Date,
   ) {
     const new_temp = new this.setTempsModel();
@@ -140,7 +140,6 @@ export class ThermostatService {
     new_temp.zone_number = zone_num;
     new_temp.set_temp = new_set_temp;
     new_temp.start_time = start_time;
-    new_temp.end_time = end_time;
 
     if (typeof expireAt != 'undefined') {
       new_temp.expireAt = expireAt;
@@ -153,9 +152,7 @@ export class ThermostatService {
     zone_num: number,
     new_set_temp: { set_temp: number },
   ): Promise<ZoneSettingsDTO> {
-    const millseconds_in_hour = 3600000;
     const mill_since_midnight = this.getMillSecSinceMidnight();
-    const t_plus_hour = mill_since_midnight + millseconds_in_hour;
 
     const dateTimeNow = new Date();
     const expire_date_time = new Date(
@@ -175,7 +172,6 @@ export class ThermostatService {
       zone_num,
       new_set_temp['set_temp'],
       mill_since_midnight,
-      t_plus_hour,
       expire_date_time,
     );
 
@@ -214,8 +210,7 @@ export class ThermostatService {
     // TODO error and return stuff
     const set_temp: number = zoneSettings['set_temp'];
     delete zoneSettings[set_temp];
-    const millsecinday = 86400000;
-    this.editSetTemp(zoneSettings['zone_number'], set_temp, 0, millsecinday);
+    this.editSetTemp(zoneSettings['zone_number'], set_temp, 0);
 
     const new_zone = new this.zoneSettingsModel(zoneSettings);
     new_zone.save(function(err) {
