@@ -1,4 +1,12 @@
-import { Controller, Get, Put, Query, Body, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Put,
+  Query,
+  Body,
+  Post,
+  Delete,
+} from '@nestjs/common';
 import { ZoneSettingsDTO } from 'src/sharedSchemes/dto/zoneSettings.dto';
 import {
   SetTempsDTO,
@@ -62,5 +70,19 @@ export class ThermostatController {
     @Body() body: JSON,
   ): Promise<ZoneSettingsDTO> {
     return this.thermostatService.editLowSet(zone_num, body);
+  }
+
+  @Delete('/setTemp')
+  async deleteSetTemp(@Query('tempId') temp_id: string): Promise<boolean> {
+    return this.thermostatService.deleteSetTemp(temp_id);
+  }
+
+  @Post('/addSetTemp')
+  async addSetTemp(
+    @Query('zone_num') zone_num: number,
+    @Body() body: SetTempsDTO,
+  ): Promise<boolean> {
+    console.log(body);
+    return this.thermostatService.addSetTemp(zone_num, body);
   }
 }

@@ -5,7 +5,10 @@ import { ZoneSettings } from '../sharedSchemes/interfaces/zoneSettings.interface
 import { SetTemps } from '../sharedSchemes/interfaces/setTemps.interface';
 import { SensorReadings } from '../sharedSchemes/interfaces/sensorReadings.interface';
 import { ZoneSettingsDTO } from '../sharedSchemes/dto/zoneSettings.dto';
-import { SetTempsDTO } from '../sharedSchemes/dto/setTemps.dto';
+import {
+  BasicSetTempsDTO,
+  SetTempsDTO,
+} from '../sharedSchemes/dto/setTemps.dto';
 import * as moment from 'moment';
 
 @Injectable()
@@ -69,7 +72,7 @@ export class ThermostatService {
     // TODO - Format time
     const set_temps = await this.setTempsModel.find(
       { zone_number: zone_num },
-      { start_time: 1, set_temp: 1, _id: 0 },
+      { start_time: 1, set_temp: 1, _id: 1 },
     );
     return set_temps;
   }
@@ -211,6 +214,40 @@ export class ThermostatService {
 
     const new_zone = new this.zoneSettingsModel(zoneSettings);
     new_zone.save(function(err) {
+      if (err) return console.error(err);
+    });
+    return true;
+  }
+
+  async deleteSetTemp(temp_id: string): Promise<boolean> {
+    this.setTempsModel.findByIdAndDelete(temp_id, function(err) {
+      if (err) {
+        return false;
+        console.log('there was a problem');
+      } else {
+        return true;
+      }
+    });
+    return false;
+  }
+
+  getTimeToSeconds(timeString: string): number {
+    const timeArr: string[] = timeString.split(':');
+
+    const hours = Number(timeArr[0]);
+    const min = Number(timeArr[1]);
+
+    return hours * 3600 + min * 60;
+  }
+
+  async addSetTemp(zone_num: number, set_temp): Promise<boolean> {
+    set_temp.setTemp = Number(set_temp.setTemp);
+    set_temp.startTime = this.getTimeToSeconds(set_temp.startTime);
+
+    const setTempDTO = BasicSetTempsDTO.createDTO(zone_num, set_temp);
+    const new_set_temp = new this.setTempsModel(setTempDTO);
+
+    new_set_temp.save(function(err) {
       if (err) return console.error(err);
     });
     return true;
